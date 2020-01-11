@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from six.moves import input
+
 from ...registries import registry
 
 
@@ -102,8 +103,9 @@ class Command(BaseCommand):
 
     def _create(self, models, options):
         for index in registry.get_indices(models):
-            self.stdout.write("Creating index '{}'".format(index._name))
-            index.create()
+            if index._name:
+                self.stdout.write("Creating index '{}'".format(index._name))
+                index.create()
 
     def _populate(self, models, options):
         parallel = options['parallel']
@@ -128,8 +130,9 @@ class Command(BaseCommand):
                 return False
 
         for index in registry.get_indices(models):
-            self.stdout.write("Deleting index '{}'".format(index._name))
-            index.delete(ignore=404)
+            if index._name:
+                self.stdout.write("Deleting index '{}'".format(index._name))
+                index.delete(ignore=404)
         return True
 
     def _rebuild(self, models, options):
